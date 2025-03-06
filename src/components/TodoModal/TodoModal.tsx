@@ -1,41 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Loader } from '../Loader';
+import { getUser } from '../../api';
 import { Todo } from '../../types/Todo';
 import { User } from '../../types/User';
 
 interface TodoModalProps {
-  todo: Todo | null;
-  user: User | null;
-  loading: boolean;
+  todo: Todo;
   onClose: () => void;
+  user: User | null;
 }
 
 export const TodoModal: React.FC<TodoModalProps> = ({
   todo,
-  user,
-  loading,
   onClose,
+  user,
 }) => {
-  if (!todo) {
-    return null;
-  }
+  const [modalUser, setModalUser] = useState<User | null>(user);
+
+  useEffect(() => {
+    if (!user) {
+      getUser(todo.userId).then(setModalUser);
+    }
+  }, [todo.userId, user]);
 
   return (
     <div className="modal is-active" data-cy="modal">
-      <div className="modal-background" />
+      <div className="modal-background" onClick={onClose} />
 
-      {loading ? (
-        <Loader />
-      ) : (
+      {modalUser ? (
         <div className="modal-card">
           <header className="modal-card-head">
-            <div
+            <p
               className="modal-card-title has-text-weight-medium"
               data-cy="modal-header"
             >
               Todo #{todo.id}
-            </div>
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+            </p>
             <button
               type="button"
               className="delete"
@@ -58,14 +58,16 @@ export const TodoModal: React.FC<TodoModalProps> = ({
                 {todo.completed ? 'Done' : 'Planned'}
               </strong>
               {' by '}
-              {user ? (
-                <a href={`mailto:${user.email}`}>{user.name}</a>
+              {modalUser ? (
+                <a href={`mailto:${modalUser.email}`}>{modalUser.name}</a>
               ) : (
-                'Unknown User'
+                'Unknown'
               )}
             </p>
           </div>
         </div>
+      ) : (
+        <Loader />
       )}
     </div>
   );

@@ -1,24 +1,24 @@
-import React from 'react';
-
 interface TodoFilterProps {
   status: string;
-  query: string;
-  onStatusChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  onSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onClear: () => void;
+  search: string;
+  onFilterChange: (status: string) => void;
+  onSearchChange: (search: string) => void;
 }
 
 export const TodoFilter: React.FC<TodoFilterProps> = ({
   status,
-  query,
-  onStatusChange,
-  onSearch,
-  onClear,
+  search,
+  onFilterChange,
+  onSearchChange,
 }) => (
   <form className="field has-addons">
     <p className="control">
       <span className="select">
-        <select data-cy="statusSelect" value={status} onChange={onStatusChange}>
+        <select
+          data-cy="statusSelect"
+          value={status}
+          onChange={e => onFilterChange(e.target.value)}
+        >
           <option value="all">All</option>
           <option value="active">Active</option>
           <option value="completed">Completed</option>
@@ -32,24 +32,27 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({
         type="text"
         className="input"
         placeholder="Search..."
-        value={query}
-        onChange={onSearch}
+        value={search}
+        onChange={e => onSearchChange(e.target.value)}
       />
       <span className="icon is-left">
         <i className="fas fa-magnifying-glass" />
       </span>
 
-      <span className="icon is-right" style={{ pointerEvents: 'all' }}>
-        {query && (
-          /* eslint-disable-next-line jsx-a11y/control-has-associated-label */
+      {search && (
+        <span
+          className="icon is-right"
+          style={{ pointerEvents: 'all' }}
+          onClick={() => onSearchChange('')}
+        >
+          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
           <button
             data-cy="clearSearchButton"
             type="button"
             className="delete"
-            onClick={onClear}
           />
-        )}
-      </span>
+        </span>
+      )}
     </p>
   </form>
 );
